@@ -90,15 +90,17 @@ const VideoPreview: FC<{ file: OdFileObject }> = ({ file }) => {
 
   const isFlv = getExtension(file.name) === 'flv'
   const {
-    loading,
-    error,
-    result: mpegts,
-  } = useAsync(async () => {
-    if (isFlv) {
-      return (await import('mpegts.js')).default
-    }
+  loading,
+  error,
+  result: mpegts,
+  } = useAsync<{ createPlayer: (options: any) => any } | undefined>(async () => {
+  if (isFlv) {
+    const mod = await import('mpegts.js')
+    return mod.default
+  }
+  return undefined
   }, [isFlv])
-
+  
   return (
     <>
       <CustomEmbedLinkMenu path={asPath} menuOpen={menuOpen} setMenuOpen={setMenuOpen} />
