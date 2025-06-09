@@ -1,17 +1,11 @@
-import Redis from 'ioredis'
-import siteConfig from '../../config/site.config'
-
-// Persistent key-value store is provided by Redis, hosted on Upstash
-// https://vercel.com/integrations/upstash
-const kv = new Redis(process.env.REDIS_URL || '')
+// Token store that directly returns static tokens (from rclone)
+// No Redis, no external DB needed
 
 export async function getOdAuthTokens(): Promise<{ accessToken: unknown; refreshToken: unknown }> {
-  const accessToken = await kv.get(`${siteConfig.kvPrefix}access_token`)
-  const refreshToken = await kv.get(`${siteConfig.kvPrefix}refresh_token`)
-
   return {
-    accessToken,
-    refreshToken,
+    accessToken: 'eyJ0eXAiOiJKV1QiLCJub25jZSI6IndxbERHdUIwWUdJd0tJdWpLYTRHOC1aRTJ6Qkg5cWVCV2FKRkg0bVR5WUUiLCJhbGciOiJSUzI1NiIsIng1dCI6IkNOdjBPSTNSd3FsSEZFVm5hb01Bc2hDSDJYRSIsImtpZCI6IkNOdjBPSTNSd3FsSEZFVm5hb01Bc2hDSDJYRSJ9.eyJhdWQiOiIwMDAwMDAwMy0wMDAwLTAwMDAtYzAwMC0wMDAwMDAwMDAwMDAiLCJpc3MiOiJodHRwczovL3N0cy53aW5kb3dzLm5ldC9mYTExYTQ3ZS04OTAyLTRkYWYtYTE4NS04MjNlOTFkZjIzYjkvIiwiaWF0IjoxNzQ5NDY5NDc3LCJuYmYiOjE3NDk0Njk0NzcsImV4cCI6MTc0OTQ3NDM0NCwiaWQiOiJhZG1pbiIsInNjb3BlIjoiRmlsZXMuUmVhZCBGaWxlcy5SZWFkLkFsbCBGaWxlcy5SZWFkV3JpdGUgRmlsZXMuUmVhZFdyaXRlLkFsbCBTaXRlcy5SZWFkLkFsbCBwcm9maWxlIG9wZW5pZCBlbWFpbCJ9.Wd9gl-IyHbb1Y58gv3P_NZDacmlP2T9vV7NWJ5H8zKbmSbkmSnLKngNr0F4kE6ATNAvo4x_9_85W6vDYUkcRrKmSCLedjnzCd-AZGTwEzVun4Gir47TwOLX5eyt06BhenktQ6VJPzj82Dn9CEyn2y-WbMg9ORpUTwz46iqhHiBnDLf3Z58baD0kUiJv9oH7GB0jtbTaA8m07x9IukUgoOPyFV3BXrLD-L1XjcTr4pjK4XxEgsc4yKZBuQ3JWEZV2SypyvRlFxcy8NkC--309XjulDSFVitHiQ2tkf4a4s1AvfR758Ksq-7uJ4Nz6Zp2hkZ8EBocslTNFUhYbRP8alA', // 🔁 Replace with full rclone access token
+    refreshToken: '1.AVYAfqQR-gKJr02hhYI-kd8judllVrGm7ZJAhTkO7Ddq_VmfAIFWAA.AgABAwEAAABVrSpeuWamRam2jAF1XRQEAwDs_wUA9P_buy_DLMKu7lfgnwEXdSImWo4UbBqb4T83Hbx73cF_JFU4j590C9hL3iLG74i0Gq7s-7WqaMPNqs-Yuk93_oaiot_PGvhIDJSXipsEZIDi26gGEFkvc6jQrgtHmx4r_hIBBNcEKdbwx0zjWsd7sPhpp917yz4gwPqMq80GkyBBl3NRK7ZhK9cJZzNmqis5Zm5X7rAylyjONVljGwLYjWfhPZ4mhxjqLH8hoNpoRx4bW0WQdn3xcDAFgXfMgMIhzX3-HuVv1KbCBsIawZoCQkh0npDmzukZFXVyVW3t_NUCf_sjApj0t4jaUsRZe4aVYWjjvd7n8JqoDPb7pCJhV1p0zAvbdu_FN0SOsghsvOpZJ6YejmF4PwG7wz6YAWpz9DXvCKX0h8WvWBq1pYYN0_qRf5Kfx1ATRB3h1wGX43o_KmVzRLnlLzG85nMV5uoGa6ydLM-osS1vHL5q1-6pLO9kfVS_mRZVr7v6__rkRFv-eIZOJVWYipwVwoz--dpaRVxoTjzkjLBNvIG6l6MQrxHt4yyLQ47p0Cyd8LE5VnG2iEjRdqOsqNHsigtzLLjvyq9BQs5ODpRnLRF4-FzrfHa9KkI2EGA_ENVN5-O4fSzOhwcn2rPGeZVsw4LzT15NB65LyqjCEVc3BTcr2kVcU8uc9vDBkufyYoSilZ7ZUlpvwvBG9ZfCvuzVGO-eitcGBIf-vpvdhi8F3ZLG6Nel-1UOwi524qErzw-fFdnbcHfYkcIOgLqgw2ouEDYvc_ZDn7V9uInZXo_t98epMTZ6xbEAmRbQAXyt3eOj_fV0Xy9_aAuzyzat29GaJRA39Y5VzUc6mMZTO94_Lv58qC-4roRKhe7R',
+    // 🔁 Replace with full rclone refresh token
   }
 }
 
@@ -24,6 +18,10 @@ export async function storeOdAuthTokens({
   accessTokenExpiry: number
   refreshToken: string
 }): Promise<void> {
-  await kv.set(`${siteConfig.kvPrefix}access_token`, accessToken, 'EX', accessTokenExpiry)
-  await kv.set(`${siteConfig.kvPrefix}refresh_token`, refreshToken)
+  // No-op: we don’t persist tokens anywhere.
+  console.log('Received new tokens (not stored):', {
+    accessToken,
+    accessTokenExpiry,
+    refreshToken,
+  })
 }
