@@ -1,3 +1,5 @@
+'use client'
+
 import type { OdFileObject } from '../../types'
 
 import { FC, useEffect, useState } from 'react'
