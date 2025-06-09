@@ -25,7 +25,7 @@ import CustomEmbedLinkMenu from '../CustomEmbedLinkMenu'
 import 'plyr-react/plyr.css'
 
 // Dynamically import Plyr to avoid SSR issues
-const Plyr = dynamic(() => import('plyr-react').then(mod => mod.Plyr), { ssr: false })
+const Plyr = dynamic(() => import('plyr-react'), { ssr: false });
 
 const VideoPlayer: FC<{
   videoName: string
